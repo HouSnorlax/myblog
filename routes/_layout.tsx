@@ -20,6 +20,10 @@ export default function Layout({ Component }: PageProps) {
             </main>
 
             {/* ■ 共通フッター */}
+            <div class="mx-auto flex flex-col items-center justify-center text-xl">
+                <img src="/13.png" alt="KSGM"/>
+                <p>KSGMがこちらを見ている</p>
+            </div>
             <footer class="bg-gray-100 text-center p-6 text-gray-500 text-sm mt-8">
                 &copy; {new Date().getFullYear()} MUHO's Blog. Built with Deno Fresh.
             </footer>
