@@ -1,6 +1,8 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
-import { CSS, render} from "@deno/gfm"; // Markdown変換ツール
+import { marked } from "https://esm.sh/marked@11.2.0";
 import { getPost, ArticleInfo } from "../../utils/posts.ts"
+import DOMPurify from "npm:isomorphic-dompurify@2.19.0";
+import { CSS } from "@deno/gfm"; 
 
 interface ArticleData {
     post: ArticleInfo;
@@ -16,7 +18,13 @@ export const handler: Handlers<ArticleData> = {
             return ctx.renderNotFound();
         }
 
-        const html = render(post.content);
+        const rawHtml = marked.parse(post.content) as string;
+
+        const html = DOMPurify.sanitize(rawHtml, {
+        ADD_ATTR: ["style", "class", "width", "height", "target"],
+        ADD_TAGS: ["iframe"], // 埋め込み
+        });
+        
         return ctx.render({ post, html });
     },
 };
