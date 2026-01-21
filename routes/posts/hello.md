@@ -2,7 +2,7 @@
 title: first post
 published_at: 2026-01-15
 snippet: このブログでやりたいことをメモります
-tag: ["雑多"]
+tag: ["日記"]
 ---
 
 # ブログの概要
