@@ -6,6 +6,7 @@ export interface ArticleInfo {
     title:       string;    
     publishedAt: Date;
     snippet:     string;  
+    tag:         string[];
     content:     string;  
 }
 
@@ -28,6 +29,7 @@ export async function getAllPosts(): Promise<ArticleInfo[]> {
             title: attrs.title as string,
             publishedAt: new Date(attrs.published_at as string),
             snippet: attrs.snippet as string,
+            tag: attrs.tag as string[],
             content: body,
         });
     }
@@ -45,6 +47,7 @@ export async function getPost(slug: string): Promise<ArticleInfo | null> {
             title: attrs.title as string,
             publishedAt: new Date(attrs.published_at as string),
             snippet: attrs.snippet as string,
+            tag: attrs.tag as string[],
             content: body,
         };
     } catch {

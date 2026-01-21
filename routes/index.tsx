@@ -36,6 +36,10 @@ export default function Home(props: PageProps<ArticleInfo[]>) {
                 {ArticleInfo.publishedAt.toLocaleDateString("ja-JP")}
               </time>
               <p class="mt-2">{ArticleInfo.snippet}</p>
+              タグ:
+              {ArticleInfo.tag.map((tag: string) => (
+                <a class="bg-gray-200 mr-1 p-0.5 border rounded" href="/">{tag}</a> 
+              ))}
             </a>
           </li>
         ))}
