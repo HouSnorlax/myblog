@@ -1,5 +1,5 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
-import { getAllPostsByTag, ArticleInfo } from "../../../utils/posts.ts";
+import { getAllPosts, ArticleInfo } from "../../../utils/posts.ts";
 
 interface ArticleData {
     post: ArticleInfo[];
@@ -10,7 +10,8 @@ export const handler: Handlers<ArticleData> = {
   async GET(_req, ctx) {
     
     const searchtag = decodeURIComponent(ctx.params.query);
-    const post = await getAllPostsByTag(searchtag); 
+    const allPosts = await getAllPosts(); 
+    const post = allPosts.filter(post => post.tag.includes(searchtag));
 
     return ctx.render({ post, searchtag });       // データを画面に渡す
   },
@@ -21,7 +22,7 @@ export default function Result(props: PageProps<ArticleData>) {
 
   return (
     <div class="p-4 mx-auto max-w-screen-md">
-      <h1 class="text-2xl font-bold mt-3 mb-3">タグ{searchtag}の記事一覧</h1>
+      <h1 class="text-2xl font-bold mt-3 mb-3">タグ&nbsp;{searchtag}&nbsp;の記事一覧</h1>
       {/* 記事のリストを表示 */}
       <ul>
         {post.map((ArticleInfo) => (
