@@ -34,7 +34,7 @@ export default function PostPage(props: PageProps<ArticleData>) {
     const { post, html } = props.data;
 
     const currentUrl = props.url.href;
-    const ogImageUrl = `${props.url.origin}/favicon.ico`;
+    const ogImageUrl = `${props.url.origin}/13.png`;
     const description = post.snippet;
 
     return (
