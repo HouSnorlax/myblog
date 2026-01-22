@@ -3,6 +3,7 @@ import { marked } from "https://esm.sh/marked@11.2.0";
 import { getPost, ArticleInfo } from "../../utils/posts.ts"
 import DOMPurify from "npm:isomorphic-dompurify@2.19.0";
 import { CSS } from "@deno/gfm"; 
+import { Head } from "$fresh/runtime.ts";
 
 interface ArticleData {
     post: ArticleInfo;
@@ -32,12 +33,31 @@ export const handler: Handlers<ArticleData> = {
 export default function PostPage(props: PageProps<ArticleData>) {
     const { post, html } = props.data;
 
+    const currentUrl = props.url.href;
+    const ogImageUrl = `${props.url.origin}/favicon.ico`;
+    const description = post.snippet;
+
     return (
         <>
             {/* Markdown用のCSS読み込み */}
-            <head>
+            <Head>
+                <title>{post.title} - MUHO's Blog</title>
+                <meta name="description" content={description} />
+
+                <meta property="og:title" content={post.title} />
+                <meta property="og:description" content={description} />
+                <meta property="og:type" content="article" />
+                <meta property="og:url" content={currentUrl} />
+                <meta property="og:image" content={ogImageUrl} />
+                <meta property="og:site_name" content="MUHO's Blog" />
+
+                <meta name="twitter:card" content="summary" /> 
+                <meta name="twitter:title" content={post.title} />
+                <meta name="twitter:description" content={description} />
+                <meta name="twitter:image" content={ogImageUrl} />
+
                 <style dangerouslySetInnerHTML={{ __html: CSS}} />
-            </head>
+            </Head>
 
 
             <div class="p-4 mx-auto max-w-screen-md">
