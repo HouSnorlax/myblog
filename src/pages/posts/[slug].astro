@@ -22,12 +22,21 @@ const formattedDate = dateVal.toLocaleDateString("ja-JP", {
 	month: '2-digit',
 	day: '2-digit'
 });
+
+// 本文から最初の画像を抽出する
+const body = post.body;
+const imgRegex = /!\[.*?\]\((.*?)\)|<img.*?src=["'](.*?)["']/i;
+const match = body.match(imgRegex);
+const firstImage = match ? (match[1] || match[2]) : undefined;
+
+// heroImage が指定されていれば優先し、なければ本文の最初の画像
+const ogImage = post.data.heroImage || firstImage;
 ---
 
 <!doctype html>
 <html lang="ja">
 	<head>
-		<BaseHead title={`${post.data.title} - MUHO's Blog`} description={post.data.snippet || post.data.description || ""} />
+		<BaseHead title={`${post.data.title} - MUHO's Blog`} description={post.data.snippet || post.data.description || ""} image={ogImage} />
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
