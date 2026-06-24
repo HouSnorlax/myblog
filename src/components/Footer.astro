@@ -1,0 +1,52 @@
+---
+const today = new Date();
+---
+
+<div class="ksgm-container">
+	<img src="/13.png" alt="KSGM" class="ksgm-image" />
+	<p class="ksgm-text">KSGMがこちらを見ている</p>
+</div>
+
+<footer>
+	&copy; {today.getFullYear()} MUHO's Blog. Built with Astro.
+</footer>
+
+<style>
+	.ksgm-container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		margin-top: 3rem;
+		margin-bottom: 1.5rem;
+		text-align: center;
+	}
+
+	.ksgm-image {
+		max-width: 150px;
+		height: auto;
+		border-radius: 8px;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+		transition: transform 0.3s ease;
+	}
+
+	.ksgm-image:hover {
+		transform: scale(1.05) rotate(2deg);
+	}
+
+	.ksgm-text {
+		font-size: 1.25rem;
+		color: #475569;
+		margin-top: 0.75rem;
+		font-weight: 500;
+	}
+
+	footer {
+		background-color: #f8fafc;
+		border-top: 1px solid #e2e8f0;
+		text-align: center;
+		padding: 1.5rem;
+		color: #64748b;
+		font-size: 0.9rem;
+	}
+</style>

@@ -1,0 +1,239 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Introduction from '../components/Introduction.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+
+const posts = (await getCollection('blog')).sort((a, b) => {
+	const aDate = a.data.published_at || a.data.pubDate || new Date(0);
+	const bDate = b.data.published_at || b.data.pubDate || new Date(0);
+	return bDate.valueOf() - aDate.valueOf();
+});
+---
+
+<!doctype html>
+<html lang="ja">
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+		<style>
+			body {
+				font-family: 'Inter', 'Noto Sans JP', sans-serif;
+				background-color: #f8fafc;
+				color: #334155;
+				margin: 0;
+				padding: 0;
+			}
+
+			main {
+				max-width: 768px; /* max-w-screen-md */
+				margin: 0 auto;
+				padding: 2rem 1rem;
+			}
+
+			.about-card {
+				padding: 1.5rem;
+				background: #ffffff;
+				border: 1px solid #e2e8f0;
+				border-radius: 12px;
+				box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+				margin-bottom: 1.5rem;
+				transition: transform 0.2s ease, box-shadow 0.2s ease;
+			}
+
+			.about-card:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+			}
+
+			.about-title {
+				font-size: 1.5rem;
+				font-weight: 700;
+				color: #1e293b;
+				margin-top: 0;
+				margin-bottom: 1rem;
+				border-bottom: 2px solid #3b82f6;
+				padding-bottom: 0.25rem;
+				display: inline-block;
+			}
+
+			.about-content {
+				font-size: 1.1rem;
+				line-height: 1.6;
+				color: #475569;
+				margin: 0;
+			}
+
+			.list-title {
+				font-size: 1.75rem;
+				font-weight: 700;
+				color: #1e293b;
+				margin-top: 2.5rem;
+				margin-bottom: 1.5rem;
+				padding-left: 0.5rem;
+				border-left: 4px solid #3b82f6;
+			}
+
+			.post-list {
+				list-style: none;
+				padding: 0;
+				margin: 0;
+				display: flex;
+				flex-direction: column;
+				gap: 1.25rem;
+			}
+
+			.post-item {
+				background: #ffffff;
+				border: 1px solid #e2e8f0;
+				border-radius: 12px;
+				padding: 1.5rem;
+				box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+				transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+			}
+
+			.post-item:hover {
+				transform: translateY(-3px);
+				box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08);
+				border-color: #bfdbfe;
+			}
+
+			.post-link {
+				text-decoration: none;
+				display: block;
+				color: inherit;
+			}
+
+			.post-title {
+				font-size: 1.35rem;
+				font-weight: 700;
+				color: #2563eb; /* Premium blue */
+				margin: 0 0 0.5rem 0;
+				line-height: 1.4;
+				transition: color 0.2s ease;
+			}
+
+			.post-item:hover .post-title {
+				color: #1d4ed8;
+				text-decoration: underline;
+			}
+
+			.post-date {
+				font-size: 0.9rem;
+				color: #64748b;
+				display: block;
+				margin-bottom: 0.75rem;
+			}
+
+			.post-snippet {
+				font-size: 1.05rem;
+				line-height: 1.5;
+				color: #475569;
+				margin: 0 0 1rem 0;
+			}
+
+			.tag-container {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+				align-items: center;
+				font-size: 0.9rem;
+				color: #64748b;
+				margin-top: 0.5rem;
+			}
+
+			.tag-label {
+				font-weight: 600;
+			}
+
+			.tag-badge {
+				background-color: #f1f5f9;
+				color: #475569;
+				padding: 0.2rem 0.6rem;
+				border-radius: 6px;
+				font-weight: 500;
+				text-decoration: none;
+				border: 1px solid #cbd5e1;
+				transition: all 0.2s ease;
+			}
+
+			.tag-badge:hover {
+				background-color: #3b82f6;
+				color: #ffffff;
+				border-color: #3b82f6;
+				transform: translateY(-1px);
+			}
+
+			@media (max-width: 640px) {
+				main {
+					padding: 1.5rem 0.75rem;
+				}
+				.about-card, .post-item {
+					padding: 1.25rem;
+				}
+				.post-title {
+					font-size: 1.2rem;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<!-- このブログについて -->
+			<div class="about-card">
+				<h2 class="about-title">このブログについて</h2>
+				<p class="about-content">
+					普段の生活でブログ書きたいなあと思うことが頻繁にあるのですが、
+					noteみたいな大きいサービスで公開したいとは思わないし、公開できるような文章力もないということで、
+					細々とやっていくためにあります　それ以上もそれ以下もありません
+				</p>
+			</div>
+
+			<!-- 自己紹介 -->
+			<Introduction />
+
+			<!-- 記事リスト -->
+			<h2 class="list-title">記事リスト</h2>
+			<ul class="post-list">
+				{posts.map((post) => {
+					const dateVal = post.data.published_at || post.data.pubDate || new Date();
+					const formattedDate = dateVal.toLocaleDateString("ja-JP", {
+						year: 'numeric',
+						month: '2-digit',
+						day: '2-digit'
+					});
+					const snippetText = post.data.snippet || post.data.description || "";
+					const tags = post.data.tag || [];
+					
+					return (
+						<li class="post-item">
+							<a href={`/posts/${post.slug}`} class="post-link">
+								<h3 class="post-title">{post.data.title}</h3>
+								<time class="post-date" datetime={dateVal.toISOString()}>
+									{formattedDate}
+								</time>
+								{snippetText && <p class="post-snippet">{snippetText}</p>}
+							</a>
+							{tags.length > 0 && (
+								<div class="tag-container">
+									<span class="tag-label">タグ:</span>
+									{tags.map((tag) => (
+										<a href={`/posts/search/${tag}`} class="tag-badge">
+											{tag}
+										</a>
+									))}
+								</div>
+							)}
+						</li>
+					);
+				})}
+			</ul>
+		</main>
+		<Footer />
+	</body>
+</html>

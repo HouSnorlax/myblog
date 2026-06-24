@@ -1,0 +1,56 @@
+---
+import { SITE_TITLE } from '../consts';
+---
+
+<header>
+	<div class="header-container">
+		<a href="/" class="brand-title">{SITE_TITLE}</a>
+		<nav>
+			<a href="/" class="nav-link">Home</a>
+		</nav>
+	</div>
+</header>
+
+<style>
+	header {
+		background-color: #1e293b; /* Dark slate gray matching bg-gray-800 look but more premium */
+		color: #ffffff;
+		padding: 1rem;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+	}
+
+	.header-container {
+		max-width: 768px; /* max-w-screen-md equivalent */
+		margin: 0 auto;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0 1rem;
+	}
+
+	.brand-title {
+		font-size: 1.5rem;
+		font-weight: 700;
+		color: #ffffff;
+		text-decoration: none;
+		transition: opacity 0.2s ease;
+	}
+
+	.brand-title:hover {
+		opacity: 0.9;
+	}
+
+	.nav-link {
+		color: #e2e8f0;
+		text-decoration: none;
+		font-weight: 500;
+		transition: color 0.2s ease;
+		padding: 0.5rem 0.75rem;
+		border-radius: 6px;
+	}
+
+	.nav-link:hover {
+		color: #ffffff;
+		background-color: rgba(255, 255, 255, 0.1);
+	}
+</style>
