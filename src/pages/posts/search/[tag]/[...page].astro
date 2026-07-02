@@ -1,11 +1,11 @@
 ---
 import { getCollection } from 'astro:content';
-import BaseHead from '../../../components/BaseHead.astro';
-import Header from '../../../components/Header.astro';
-import Footer from '../../../components/Footer.astro';
-import { SITE_TITLE } from '../../../consts';
+import BaseHead from '../../../../components/BaseHead.astro';
+import Header from '../../../../components/Header.astro';
+import Footer from '../../../../components/Footer.astro';
+import { SITE_TITLE } from '../../../../consts';
 
-export async function getStaticPaths() {
+export async function getStaticPaths({ paginate }) {
 	const posts = await getCollection('blog');
 	
 	// Get all unique tags
@@ -16,27 +16,30 @@ export async function getStaticPaths() {
 		}
 	});
 
-	return Array.from(tags).map((tag) => ({
-		params: { tag },
-		props: { tag },
-	}));
+	return Array.from(tags).flatMap((tag) => {
+		const filteredPosts = posts
+			.filter((post) => post.data.tag && post.data.tag.includes(tag))
+			.sort((a, b) => {
+				const aDate = a.data.published_at || a.data.pubDate || new Date(0);
+				const bDate = b.data.published_at || b.data.pubDate || new Date(0);
+				return bDate.valueOf() - aDate.valueOf();
+			});
+		return paginate(filteredPosts, {
+			params: { tag },
+			pageSize: 10,
+		});
+	});
 }
 
-const { tag } = Astro.props;
-
-const posts = (await getCollection('blog'))
-	.filter((post) => post.data.tag && post.data.tag.includes(tag))
-	.sort((a, b) => {
-		const aDate = a.data.published_at || a.data.pubDate || new Date(0);
-		const bDate = b.data.published_at || b.data.pubDate || new Date(0);
-		return bDate.valueOf() - aDate.valueOf();
-	});
+const { tag } = Astro.params;
+const { page } = Astro.props;
+const { data: posts } = page;
 ---
 
 <!doctype html>
 <html lang="ja">
 	<head>
-		<BaseHead title={`タグ ${tag} の記事一覧 - ${SITE_TITLE}`} description={`タグ「${tag}」が付いた記事の一覧を表示します。`} />
+		<BaseHead title={`タグ ${tag} の記事一覧 (ページ ${page.currentPage}) - ${SITE_TITLE}`} description={`タグ「${tag}」が付いた記事の一覧を表示します。`} />
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -144,7 +147,6 @@ const posts = (await getCollection('blog'))
 				align-items: center;
 				font-size: 0.9rem;
 				color: #64748b;
-				margin-top: 0.5rem;
 			}
 
 			.tag-label {
@@ -169,6 +171,58 @@ const posts = (await getCollection('blog'))
 				transform: translateY(-1px);
 			}
 
+			/* Pagination styles */
+			.pagination {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				gap: 0.5rem;
+				margin-top: 3rem;
+			}
+
+			.page-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				min-width: 2.5rem;
+				height: 2.5rem;
+				padding: 0 0.5rem;
+				border-radius: 8px;
+				background-color: #ffffff;
+				border: 1px solid #e2e8f0;
+				color: #475569;
+				text-decoration: none;
+				font-weight: 500;
+				font-size: 0.95rem;
+				transition: all 0.2s ease;
+				box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+			}
+
+			.page-btn:hover:not(.page-disabled) {
+				border-color: #3b82f6;
+				color: #3b82f6;
+				transform: translateY(-1px);
+			}
+
+			.page-current {
+				background-color: #3b82f6;
+				border-color: #3b82f6;
+				color: #ffffff !important;
+				font-weight: 600;
+			}
+
+			.page-arrow {
+				padding: 0 1rem;
+			}
+
+			.page-disabled {
+				color: #cbd5e1;
+				border-color: #f1f5f9;
+				background-color: #f8fafc;
+				cursor: not-allowed;
+				box-shadow: none;
+			}
+
 			@media (max-width: 640px) {
 				main {
 					padding: 1.5rem 0.75rem;
@@ -187,7 +241,7 @@ const posts = (await getCollection('blog'))
 		<main>
 			<a href="/" class="back-link">← ホームに戻る</a>
 
-			<h2 class="list-title">タグ {tag} の記事一覧</h2>
+			<h2 class="list-title">タグ {tag} の記事一覧 {page.lastPage > 1 && `(${page.currentPage} / ${page.lastPage} ページ)`}</h2>
 			<ul class="post-list">
 				{posts.map((post) => {
 					const dateVal = post.data.published_at || post.data.pubDate || new Date();
@@ -222,6 +276,34 @@ const posts = (await getCollection('blog'))
 					);
 				})}
 			</ul>
+
+			{/* Pagination Controls */}
+			{page.lastPage > 1 && (
+				<nav class="pagination">
+					{page.url.prev ? (
+						<a href={page.url.prev} class="page-btn page-arrow">← 前へ</a>
+					) : (
+						<span class="page-btn page-disabled page-arrow">← 前へ</span>
+					)}
+					
+					{Array.from({ length: page.lastPage }, (_, i) => {
+						const pageNum = i + 1;
+						const pageUrl = pageNum === 1 ? `/posts/search/${tag}` : `/posts/search/${tag}/${pageNum}`;
+						const isCurrent = pageNum === page.currentPage;
+						return (
+							<a href={pageUrl} class={`page-btn ${isCurrent ? 'page-current' : ''}`}>
+								{pageNum}
+							</a>
+						);
+					})}
+
+					{page.url.next ? (
+						<a href={page.url.next} class="page-btn page-arrow">次へ →</a>
+					) : (
+						<span class="page-btn page-disabled page-arrow">次へ →</span>
+					)}
+				</nav>
+			)}
 		</main>
 		<Footer />
 	</body>

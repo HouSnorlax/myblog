@@ -1,24 +1,27 @@
 ---
 import { getCollection } from 'astro:content';
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import Introduction from '../components/Introduction.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { SITE_TITLE } from '../../consts';
 
-const allPosts = (await getCollection('blog')).sort((a, b) => {
-	const aDate = a.data.published_at || a.data.pubDate || new Date(0);
-	const bDate = b.data.published_at || b.data.pubDate || new Date(0);
-	return bDate.valueOf() - aDate.valueOf();
-});
-const posts = allPosts.slice(0, 3);
-const hasMore = allPosts.length > 3;
+export async function getStaticPaths({ paginate }) {
+	const posts = (await getCollection('blog')).sort((a, b) => {
+		const aDate = a.data.published_at || a.data.pubDate || new Date(0);
+		const bDate = b.data.published_at || b.data.pubDate || new Date(0);
+		return bDate.valueOf() - aDate.valueOf();
+	});
+	return paginate(posts, { pageSize: 10 });
+}
+
+const { page } = Astro.props;
+const { data: posts } = page;
 ---
 
 <!doctype html>
 <html lang="ja">
 	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<BaseHead title={`記事一覧 (ページ ${page.currentPage}) - ${SITE_TITLE}`} description={`${SITE_TITLE}の記事一覧ページです。`} />
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -37,44 +40,25 @@ const hasMore = allPosts.length > 3;
 				padding: 2rem 1rem;
 			}
 
-			.about-card {
-				padding: 1.5rem;
-				background: #ffffff;
-				border: 1px solid #e2e8f0;
-				border-radius: 12px;
-				box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-				margin-bottom: 1.5rem;
-				transition: transform 0.2s ease, box-shadow 0.2s ease;
-			}
-
-			.about-card:hover {
-				transform: translateY(-2px);
-				box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
-			}
-
-			.about-title {
-				font-size: 1.5rem;
-				font-weight: 700;
-				color: #1e293b;
-				margin-top: 0;
-				margin-bottom: 1rem;
-				border-bottom: 2px solid #3b82f6;
-				padding-bottom: 0.25rem;
+			.back-link {
 				display: inline-block;
+				margin-bottom: 1.5rem;
+				color: #2563eb;
+				text-decoration: none;
+				font-weight: 500;
+				transition: color 0.2s ease, transform 0.2s ease;
 			}
 
-			.about-content {
-				font-size: 1.1rem;
-				line-height: 1.6;
-				color: #475569;
-				margin: 0;
+			.back-link:hover {
+				color: #1d4ed8;
+				transform: translateX(-4px);
 			}
 
 			.list-title {
 				font-size: 1.75rem;
 				font-weight: 700;
 				color: #1e293b;
-				margin-top: 2.5rem;
+				margin-top: 0;
 				margin-bottom: 1.5rem;
 				padding-left: 0.5rem;
 				border-left: 4px solid #3b82f6;
@@ -113,7 +97,7 @@ const hasMore = allPosts.length > 3;
 			.post-title {
 				font-size: 1.35rem;
 				font-weight: 700;
-				color: #2563eb; /* Premium blue */
+				color: #2563eb;
 				margin: 0 0 0.5rem 0;
 				line-height: 1.4;
 				transition: color 0.2s ease;
@@ -147,36 +131,6 @@ const hasMore = allPosts.length > 3;
 				color: #64748b;
 			}
 
-			.post-footer {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				margin-top: 0.5rem;
-				flex-wrap: wrap;
-				gap: 1rem;
-			}
-
-			.more-posts-link {
-				display: inline-flex;
-				align-items: center;
-				background-color: #3b82f6;
-				color: #ffffff !important;
-				padding: 0.35rem 0.85rem;
-				border-radius: 6px;
-				font-size: 0.9rem;
-				font-weight: 600;
-				text-decoration: none;
-				transition: background-color 0.2s ease, transform 0.2s ease;
-				box-shadow: 0 2px 4px rgba(59, 130, 246, 0.15);
-				margin-left: auto;
-			}
-
-			.more-posts-link:hover {
-				background-color: #2563eb;
-				transform: translateY(-1px);
-				text-decoration: none !important;
-			}
-
 			.tag-label {
 				font-weight: 600;
 			}
@@ -199,11 +153,63 @@ const hasMore = allPosts.length > 3;
 				transform: translateY(-1px);
 			}
 
+			/* Pagination styles */
+			.pagination {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				gap: 0.5rem;
+				margin-top: 3rem;
+			}
+
+			.page-btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				min-width: 2.5rem;
+				height: 2.5rem;
+				padding: 0 0.5rem;
+				border-radius: 8px;
+				background-color: #ffffff;
+				border: 1px solid #e2e8f0;
+				color: #475569;
+				text-decoration: none;
+				font-weight: 500;
+				font-size: 0.95rem;
+				transition: all 0.2s ease;
+				box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+			}
+
+			.page-btn:hover:not(.page-disabled) {
+				border-color: #3b82f6;
+				color: #3b82f6;
+				transform: translateY(-1px);
+			}
+
+			.page-current {
+				background-color: #3b82f6;
+				border-color: #3b82f6;
+				color: #ffffff !important;
+				font-weight: 600;
+			}
+
+			.page-arrow {
+				padding: 0 1rem;
+			}
+
+			.page-disabled {
+				color: #cbd5e1;
+				border-color: #f1f5f9;
+				background-color: #f8fafc;
+				cursor: not-allowed;
+				box-shadow: none;
+			}
+
 			@media (max-width: 640px) {
 				main {
 					padding: 1.5rem 0.75rem;
 				}
-				.about-card, .post-item {
+				.post-item {
 					padding: 1.25rem;
 				}
 				.post-title {
@@ -215,23 +221,11 @@ const hasMore = allPosts.length > 3;
 	<body>
 		<Header />
 		<main>
-			<!-- このブログについて -->
-			<div class="about-card">
-				<h2 class="about-title">このブログについて</h2>
-				<p class="about-content">
-					普段の生活でブログ書きたいなあと思うことが頻繁にあるのですが、
-					noteみたいな大きいサービスで公開したいとは思わないし、公開できるような文章力もないということで、
-					細々とやっていくためにあります　それ以上もそれ以下もありません
-				</p>
-			</div>
+			<a href="/" class="back-link">← ホームに戻る</a>
 
-			<!-- 自己紹介 -->
-			<Introduction />
-
-			<!-- 記事リスト -->
-			<h2 class="list-title">記事リスト</h2>
+			<h2 class="list-title">記事一覧 {page.lastPage > 1 && `(${page.currentPage} / ${page.lastPage} ページ)`}</h2>
 			<ul class="post-list">
-				{posts.map((post, index) => {
+				{posts.map((post) => {
 					const dateVal = post.data.published_at || post.data.pubDate || new Date();
 					const formattedDate = dateVal.toLocaleDateString("ja-JP", {
 						year: 'numeric',
@@ -240,7 +234,6 @@ const hasMore = allPosts.length > 3;
 					});
 					const snippetText = post.data.snippet || post.data.description || "";
 					const tags = post.data.tag || [];
-					const isThird = index === 2;
 					
 					return (
 						<li class="post-item">
@@ -251,27 +244,48 @@ const hasMore = allPosts.length > 3;
 								</time>
 								{snippetText && <p class="post-snippet">{snippetText}</p>}
 							</a>
-							<div class="post-footer">
-								{tags.length > 0 && (
-									<div class="tag-container">
-										<span class="tag-label">タグ:</span>
-										{tags.map((tag) => (
-											<a href={`/posts/search/${tag}`} class="tag-badge">
-												{tag}
-											</a>
-										))}
-									</div>
-								)}
-								{isThird && hasMore && (
-									<a href="/posts" class="more-posts-link">
-										もっと見る →
-									</a>
-								)}
-							</div>
+							{tags.length > 0 && (
+								<div class="tag-container">
+									<span class="tag-label">タグ:</span>
+									{tags.map((tag) => (
+										<a href={`/posts/search/${tag}`} class="tag-badge">
+											{tag}
+										</a>
+									))}
+								</div>
+							)}
 						</li>
 					);
 				})}
 			</ul>
+
+			{/* Pagination Controls */}
+			{page.lastPage > 1 && (
+				<nav class="pagination">
+					{page.url.prev ? (
+						<a href={page.url.prev} class="page-btn page-arrow">← 前へ</a>
+					) : (
+						<span class="page-btn page-disabled page-arrow">← 前へ</span>
+					)}
+					
+					{Array.from({ length: page.lastPage }, (_, i) => {
+						const pageNum = i + 1;
+						const pageUrl = pageNum === 1 ? '/posts' : `/posts/${pageNum}`;
+						const isCurrent = pageNum === page.currentPage;
+						return (
+							<a href={pageUrl} class={`page-btn ${isCurrent ? 'page-current' : ''}`}>
+								{pageNum}
+							</a>
+						);
+					})}
+
+					{page.url.next ? (
+						<a href={page.url.next} class="page-btn page-arrow">次へ →</a>
+					) : (
+						<span class="page-btn page-disabled page-arrow">次へ →</span>
+					)}
+				</nav>
+			)}
 		</main>
 		<Footer />
 	</body>
