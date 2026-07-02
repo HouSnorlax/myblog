@@ -147,13 +147,10 @@ const hasMore = allPosts.length > 3;
 				color: #64748b;
 			}
 
-			.post-footer {
+			.more-container {
 				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				margin-top: 0.5rem;
-				flex-wrap: wrap;
-				gap: 1rem;
+				justify-content: flex-end;
+				margin-top: 1.5rem;
 			}
 
 			.more-posts-link {
@@ -161,14 +158,13 @@ const hasMore = allPosts.length > 3;
 				align-items: center;
 				background-color: #3b82f6;
 				color: #ffffff !important;
-				padding: 0.35rem 0.85rem;
-				border-radius: 6px;
-				font-size: 0.9rem;
+				padding: 0.5rem 1.25rem;
+				border-radius: 8px;
+				font-size: 0.95rem;
 				font-weight: 600;
 				text-decoration: none;
 				transition: background-color 0.2s ease, transform 0.2s ease;
-				box-shadow: 0 2px 4px rgba(59, 130, 246, 0.15);
-				margin-left: auto;
+				box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
 			}
 
 			.more-posts-link:hover {
@@ -231,7 +227,7 @@ const hasMore = allPosts.length > 3;
 			<!-- 記事リスト -->
 			<h2 class="list-title">記事リスト</h2>
 			<ul class="post-list">
-				{posts.map((post, index) => {
+				{posts.map((post) => {
 					const dateVal = post.data.published_at || post.data.pubDate || new Date();
 					const formattedDate = dateVal.toLocaleDateString("ja-JP", {
 						year: 'numeric',
@@ -240,7 +236,6 @@ const hasMore = allPosts.length > 3;
 					});
 					const snippetText = post.data.snippet || post.data.description || "";
 					const tags = post.data.tag || [];
-					const isThird = index === 2;
 					
 					return (
 						<li class="post-item">
@@ -251,27 +246,28 @@ const hasMore = allPosts.length > 3;
 								</time>
 								{snippetText && <p class="post-snippet">{snippetText}</p>}
 							</a>
-							<div class="post-footer">
-								{tags.length > 0 && (
-									<div class="tag-container">
-										<span class="tag-label">タグ:</span>
-										{tags.map((tag) => (
-											<a href={`/posts/search/${tag}`} class="tag-badge">
-												{tag}
-											</a>
-										))}
-									</div>
-								)}
-								{isThird && hasMore && (
-									<a href="/posts" class="more-posts-link">
-										もっと見る →
-									</a>
-								)}
-							</div>
+							{tags.length > 0 && (
+								<div class="tag-container">
+									<span class="tag-label">タグ:</span>
+									{tags.map((tag) => (
+										<a href={`/posts/search/${tag}`} class="tag-badge">
+											{tag}
+										</a>
+									))}
+								</div>
+							)}
 						</li>
 					);
 				})}
 			</ul>
+
+			{hasMore && (
+				<div class="more-container">
+					<a href="/posts" class="more-posts-link">
+						もっと見る →
+					</a>
+				</div>
+			)}
 		</main>
 		<Footer />
 	</body>
