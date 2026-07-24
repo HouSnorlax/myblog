@@ -1,6 +1,8 @@
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 
+import cloudflare from "@astrojs/cloudflare";
+
 function remarkBracketRuby() {
 	return (tree) => {
 		function visit(node) {
@@ -50,14 +52,18 @@ function remarkBracketRuby() {
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://muho.muho.workers.dev',
-	markdown: {
+    site: 'https://muho.muho.workers.dev',
+
+    markdown: {
 		remarkPlugins: [remarkBracketRuby],
 	},
-	integrations: [
+
+    integrations: [
 		mdx({
 			remarkPlugins: [remarkBracketRuby],
 		}),
 	],
-});
 
+    output: "hybrid",
+    adapter: cloudflare()
+});
