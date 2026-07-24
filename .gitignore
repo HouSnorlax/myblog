@@ -25,3 +25,9 @@ pnpm-debug.log*
 
 # personal development rule
 development_rule.md
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
