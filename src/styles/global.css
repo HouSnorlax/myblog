@@ -195,3 +195,15 @@ hr {
 	margin-right: auto !important;
 }
 
+/* Ruby text styling */
+ruby {
+	ruby-align: center;
+}
+rt {
+	font-size: 0.55em;
+	font-weight: normal;
+	color: rgb(var(--gray-dark));
+	line-height: 1;
+}
+
+
