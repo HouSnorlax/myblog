@@ -32,12 +32,17 @@ const { data: posts } = page;
 				color: #334155;
 				margin: 0;
 				padding: 0;
+				width: 100%;
+				max-width: 100%;
+				overflow-x: hidden;
 			}
 
 			main {
+				width: 100%;
 				max-width: 768px; /* max-w-screen-md */
 				margin: 0 auto;
 				padding: 2rem 1rem;
+				box-sizing: border-box;
 			}
 
 			.back-link {
@@ -62,6 +67,8 @@ const { data: posts } = page;
 				margin-bottom: 1.5rem;
 				padding-left: 0.5rem;
 				border-left: 4px solid #3b82f6;
+				overflow-wrap: break-word;
+				word-break: break-word;
 			}
 
 			.post-list {
@@ -71,6 +78,7 @@ const { data: posts } = page;
 				display: flex;
 				flex-direction: column;
 				gap: 1.25rem;
+				width: 100%;
 			}
 
 			.post-item {
@@ -80,6 +88,10 @@ const { data: posts } = page;
 				padding: 1.5rem;
 				box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
 				transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+				box-sizing: border-box;
+				overflow-wrap: break-word;
+				word-break: break-word;
+				width: 100%;
 			}
 
 			.post-item:hover {
@@ -101,6 +113,8 @@ const { data: posts } = page;
 				margin: 0 0 0.5rem 0;
 				line-height: 1.4;
 				transition: color 0.2s ease;
+				overflow-wrap: break-word;
+				word-break: break-word;
 			}
 
 			.post-item:hover .post-title {
@@ -116,10 +130,12 @@ const { data: posts } = page;
 			}
 
 			.post-snippet {
-				font-size: 1.05rem;
+				font-size: 1rem;
 				line-height: 1.5;
 				color: #475569;
 				margin: 0 0 1rem 0;
+				overflow-wrap: break-word;
+				word-break: break-word;
 			}
 
 			.tag-container {
@@ -160,6 +176,7 @@ const { data: posts } = page;
 				align-items: center;
 				gap: 0.5rem;
 				margin-top: 3rem;
+				flex-wrap: wrap;
 			}
 
 			.page-btn {
@@ -178,6 +195,7 @@ const { data: posts } = page;
 				font-size: 0.95rem;
 				transition: all 0.2s ease;
 				box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+				box-sizing: border-box;
 			}
 
 			.page-btn:hover:not(.page-disabled) {
@@ -194,7 +212,7 @@ const { data: posts } = page;
 			}
 
 			.page-arrow {
-				padding: 0 1rem;
+				padding: 0 0.75rem;
 			}
 
 			.page-disabled {
@@ -207,13 +225,42 @@ const { data: posts } = page;
 
 			@media (max-width: 640px) {
 				main {
-					padding: 1.5rem 0.75rem;
+					padding: 1.25rem 0.75rem;
 				}
 				.post-item {
-					padding: 1.25rem;
+					padding: 1.25rem 1rem;
+				}
+				.list-title {
+					font-size: 1.35rem;
+					margin-bottom: 1rem;
 				}
 				.post-title {
-					font-size: 1.2rem;
+					font-size: 1.15rem;
+				}
+				.post-snippet {
+					font-size: 0.9rem;
+				}
+				.tag-container {
+					font-size: 0.85rem;
+					gap: 0.35rem;
+				}
+				.tag-badge {
+					padding: 0.15rem 0.5rem;
+					font-size: 0.8rem;
+				}
+				.pagination {
+					gap: 0.35rem;
+					margin-top: 2rem;
+				}
+				.page-btn {
+					min-width: 2.25rem;
+					height: 2.25rem;
+					font-size: 0.85rem;
+					padding: 0 0.35rem;
+				}
+				.page-arrow {
+					padding: 0 0.5rem;
+					font-size: 0.85rem;
 				}
 			}
 		</style>

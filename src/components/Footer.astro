@@ -20,10 +20,13 @@ const today = new Date();
 		margin-top: 3rem;
 		margin-bottom: 1.5rem;
 		text-align: center;
+		padding: 0 1rem;
+		box-sizing: border-box;
 	}
 
 	.ksgm-image {
 		max-width: 150px;
+		width: 100%;
 		height: auto;
 		border-radius: 8px;
 		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
@@ -35,7 +38,7 @@ const today = new Date();
 	}
 
 	.ksgm-text {
-		font-size: 1.25rem;
+		font-size: 1.15rem;
 		color: #475569;
 		margin-top: 0.75rem;
 		font-weight: 500;
@@ -45,8 +48,26 @@ const today = new Date();
 		background-color: #f8fafc;
 		border-top: 1px solid #e2e8f0;
 		text-align: center;
-		padding: 1.5rem;
+		padding: 1.5rem 1rem;
 		color: #64748b;
 		font-size: 0.9rem;
+		box-sizing: border-box;
+	}
+
+	@media (max-width: 640px) {
+		.ksgm-container {
+			margin-top: 2rem;
+			margin-bottom: 1rem;
+		}
+		.ksgm-image {
+			max-width: 120px;
+		}
+		.ksgm-text {
+			font-size: 1rem;
+		}
+		footer {
+			padding: 1.25rem 0.75rem;
+			font-size: 0.85rem;
+		}
 	}
 </style>

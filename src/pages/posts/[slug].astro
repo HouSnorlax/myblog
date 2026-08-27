@@ -47,12 +47,17 @@ const ogImage = post.data.heroImage || firstImage;
 				color: #334155;
 				margin: 0;
 				padding: 0;
+				width: 100%;
+				max-width: 100%;
+				overflow-x: hidden;
 			}
 
 			main {
+				width: 100%;
 				max-width: 768px; /* max-w-screen-md */
 				margin: 0 auto;
 				padding: 2rem 1rem;
+				box-sizing: border-box;
 			}
 
 			.back-link {
@@ -75,6 +80,10 @@ const ogImage = post.data.heroImage || firstImage;
 				border-radius: 12px;
 				padding: 2rem;
 				box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+				box-sizing: border-box;
+				width: 100%;
+				overflow-wrap: break-word;
+				word-break: break-word;
 			}
 
 			.article-title {
@@ -84,6 +93,8 @@ const ogImage = post.data.heroImage || firstImage;
 				margin-top: 0;
 				margin-bottom: 0.5rem;
 				line-height: 1.3;
+				overflow-wrap: break-word;
+				word-break: break-word;
 			}
 
 			.article-date {
@@ -97,9 +108,11 @@ const ogImage = post.data.heroImage || firstImage;
 
 			/* Styled typography for the post body */
 			.article-body {
-				font-size: 1.1rem;
+				font-size: 1.05rem;
 				line-height: 1.8;
 				color: #334155;
+				overflow-wrap: break-word;
+				word-break: break-word;
 			}
 
 			.article-body :global(h1),
@@ -110,20 +123,27 @@ const ogImage = post.data.heroImage || firstImage;
 				font-weight: 700;
 				margin-top: 2rem;
 				margin-bottom: 1rem;
+				overflow-wrap: break-word;
+				word-break: break-word;
 			}
 
-			.article-body :global(h1) { font-size: 1.75rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem; }
-			.article-body :global(h2) { font-size: 1.5rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.25rem; }
-			.article-body :global(h3) { font-size: 1.25rem; }
+			.article-body :global(h1) { font-size: 1.6rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem; }
+			.article-body :global(h2) { font-size: 1.35rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.25rem; }
+			.article-body :global(h3) { font-size: 1.15rem; }
+			.article-body :global(h4) { font-size: 1.05rem; }
 
 			.article-body :global(p) {
 				margin-bottom: 1.25rem;
+				overflow-wrap: break-word;
+				word-break: break-word;
 			}
 
 			.article-body :global(ul),
 			.article-body :global(ol) {
 				margin-bottom: 1.25rem;
 				padding-left: 1.5rem;
+				overflow-wrap: break-word;
+				word-break: break-word;
 			}
 
 			.article-body :global(li) {
@@ -135,8 +155,9 @@ const ogImage = post.data.heroImage || firstImage;
 				background-color: #f1f5f9;
 				padding: 0.2rem 0.4rem;
 				border-radius: 4px;
-				font-size: 0.95em;
+				font-size: 0.9em;
 				color: #0f172a;
+				word-break: break-word;
 			}
 
 			.article-body :global(pre) {
@@ -146,6 +167,8 @@ const ogImage = post.data.heroImage || firstImage;
 				border-radius: 8px;
 				overflow-x: auto;
 				margin-bottom: 1.25rem;
+				max-width: 100%;
+				box-sizing: border-box;
 			}
 
 			.article-body :global(pre code) {
@@ -154,6 +177,7 @@ const ogImage = post.data.heroImage || firstImage;
 				border-radius: 0;
 				color: inherit;
 				font-size: 0.9em;
+				word-break: normal;
 			}
 
 			.article-body :global(blockquote) {
@@ -164,12 +188,16 @@ const ogImage = post.data.heroImage || firstImage;
 				border-radius: 0 8px 8px 0;
 				font-style: italic;
 				color: #1e3a8a;
+				overflow-wrap: break-word;
+				word-break: break-word;
 			}
 
 			.article-body :global(a) {
 				color: #2563eb;
 				text-decoration: none;
 				border-bottom: 1px dashed #2563eb;
+				word-break: break-word;
+				overflow-wrap: anywhere;
 			}
 
 			.article-body :global(a:hover) {
@@ -184,6 +212,14 @@ const ogImage = post.data.heroImage || firstImage;
 				border-radius: 8px;
 				margin: 1.5rem auto;
 				box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+			}
+
+			.article-body :global(table) {
+				display: block;
+				width: 100%;
+				max-width: 100%;
+				overflow-x: auto;
+				border-collapse: collapse;
 			}
 
 			.tag-container {
@@ -222,13 +258,38 @@ const ogImage = post.data.heroImage || firstImage;
 
 			@media (max-width: 640px) {
 				main {
-					padding: 1.5rem 0.75rem;
+					padding: 1.25rem 0.75rem;
 				}
 				.article-container {
-					padding: 1.5rem;
+					padding: 1.25rem 1rem;
 				}
 				.article-title {
-					font-size: 1.75rem;
+					font-size: 1.45rem;
+					line-height: 1.35;
+				}
+				.article-date {
+					font-size: 0.85rem;
+					margin-bottom: 1.5rem;
+					padding-bottom: 0.75rem;
+				}
+				.article-body {
+					font-size: 0.95rem;
+					line-height: 1.7;
+				}
+				.article-body :global(h1) { font-size: 1.3rem; margin-top: 1.5rem; }
+				.article-body :global(h2) { font-size: 1.15rem; margin-top: 1.25rem; }
+				.article-body :global(h3) { font-size: 1.05rem; }
+				.article-body :global(pre) {
+					padding: 0.75rem;
+					font-size: 0.85rem;
+				}
+				.tag-container {
+					font-size: 0.85rem;
+					gap: 0.35rem;
+				}
+				.tag-badge {
+					padding: 0.15rem 0.5rem;
+					font-size: 0.8rem;
 				}
 			}
 		</style>

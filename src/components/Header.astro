@@ -15,25 +15,30 @@ import { SITE_TITLE } from '../consts';
 	header {
 		background-color: #1e293b; /* Dark slate gray matching bg-gray-800 look but more premium */
 		color: #ffffff;
-		padding: 1rem;
+		padding: 0.875rem 0;
 		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+		width: 100%;
+		box-sizing: border-box;
 	}
 
 	.header-container {
+		width: 100%;
 		max-width: 768px; /* max-w-screen-md equivalent */
 		margin: 0 auto;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 		padding: 0 1rem;
+		box-sizing: border-box;
 	}
 
 	.brand-title {
-		font-size: 1.5rem;
+		font-size: 1.4rem;
 		font-weight: 700;
 		color: #ffffff;
 		text-decoration: none;
 		transition: opacity 0.2s ease;
+		line-height: 1.2;
 	}
 
 	.brand-title:hover {
@@ -45,12 +50,29 @@ import { SITE_TITLE } from '../consts';
 		text-decoration: none;
 		font-weight: 500;
 		transition: color 0.2s ease;
-		padding: 0.5rem 0.75rem;
+		padding: 0.4rem 0.75rem;
 		border-radius: 6px;
+		font-size: 0.95rem;
 	}
 
 	.nav-link:hover {
 		color: #ffffff;
 		background-color: rgba(255, 255, 255, 0.1);
+	}
+
+	@media (max-width: 640px) {
+		header {
+			padding: 0.75rem 0;
+		}
+		.header-container {
+			padding: 0 0.75rem;
+		}
+		.brand-title {
+			font-size: 1.2rem;
+		}
+		.nav-link {
+			padding: 0.35rem 0.6rem;
+			font-size: 0.9rem;
+		}
 	}
 </style>

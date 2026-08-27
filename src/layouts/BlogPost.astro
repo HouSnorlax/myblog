@@ -18,9 +18,11 @@ const displayDescription = description || snippet || '';
 		<BaseHead title={title} description={displayDescription} />
 		<style>
 			main {
-				width: calc(100% - 2em);
-				max-width: 100%;
-				margin: 0;
+				width: 100%;
+				max-width: 768px;
+				margin: 0 auto;
+				padding: 2rem 1rem;
+				box-sizing: border-box;
 			}
 			.hero-image {
 				width: 100%;
@@ -30,22 +32,30 @@ const displayDescription = description || snippet || '';
 				margin: 0 auto;
 				border-radius: 12px;
 				box-shadow: var(--box-shadow);
+				max-width: 100%;
+				height: auto;
 			}
 			.prose {
-				width: 720px;
-				max-width: calc(100% - 2em);
+				width: 100%;
+				max-width: 768px;
 				margin: auto;
-				padding: 1em;
+				padding: 1rem 0;
 				color: rgb(var(--gray-dark));
+				box-sizing: border-box;
+				overflow-wrap: break-word;
+				word-break: break-word;
 			}
 			.title {
-				margin-bottom: 1em;
+				margin-bottom: 1.5em;
 				padding: 1em 0;
 				text-align: center;
-				line-height: 1;
+				line-height: 1.2;
 			}
 			.title h1 {
 				margin: 0 0 0.5em 0;
+				font-size: 2.25em;
+				overflow-wrap: break-word;
+				word-break: break-word;
 			}
 			.date {
 				margin-bottom: 0.5em;
@@ -53,6 +63,14 @@ const displayDescription = description || snippet || '';
 			}
 			.last-updated-on {
 				font-style: italic;
+			}
+			@media (max-width: 640px) {
+				main {
+					padding: 1.25rem 0.75rem;
+				}
+				.title h1 {
+					font-size: 1.5em;
+				}
 			}
 		</style>
 	</head>
