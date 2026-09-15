@@ -1,46 +1,50 @@
 ---
 import { getCollection } from 'astro:content';
-import Layout from '../../../../layouts/Layout.astro';
-import { SITE_TITLE } from '../../../../consts';
+import Layout from '../../../../../layouts/Layout.astro';
+import { SITE_TITLE } from '../../../../../consts';
 
 export async function getStaticPaths({ paginate }) {
-	const posts = await getCollection('blog');
-	
-	// Get all unique tags
-	const tags = new Set<string>();
-	posts.forEach((post) => {
-		if (post.data.tag) {
-			post.data.tag.forEach((t) => tags.add(t));
-		}
+	const posts = (await getCollection('blog')).sort((a, b) => {
+		const aDate = a.data.published_at || a.data.pubDate || new Date(0);
+		const bDate = b.data.published_at || b.data.pubDate || new Date(0);
+		return bDate.valueOf() - aDate.valueOf();
 	});
 
-	return Array.from(tags).flatMap((tag) => {
-		const filteredPosts = posts
-			.filter((post) => post.data.tag && post.data.tag.includes(tag))
-			.sort((a, b) => {
-				const aDate = a.data.published_at || a.data.pubDate || new Date(0);
-				const bDate = b.data.published_at || b.data.pubDate || new Date(0);
-				return bDate.valueOf() - aDate.valueOf();
-			});
-		return paginate(filteredPosts, {
-			params: { tag },
+	// 年月ごとのグループを作成
+	const groups = new Map<string, typeof posts>();
+	posts.forEach((post) => {
+		const date = post.data.published_at || post.data.pubDate || new Date(0);
+		const year = date.getFullYear().toString();
+		const month = String(date.getMonth() + 1).padStart(2, '0');
+		const key = `${year}/${month}`;
+		if (!groups.has(key)) {
+			groups.set(key, []);
+		}
+		groups.get(key)!.push(post);
+	});
+
+	return Array.from(groups.entries()).flatMap(([key, groupPosts]) => {
+		const [year, month] = key.split('/');
+		return paginate(groupPosts, {
+			params: { year, month },
 			pageSize: 10,
 		});
 	});
 }
 
-const { tag } = Astro.params;
+const { year, month } = Astro.params;
 const { page } = Astro.props;
 const { data: posts } = page;
+const displayMonth = `${year}年${parseInt(month, 10)}月`;
 ---
 
 <Layout
-	title={`タグ ${tag} の記事一覧 (ページ ${page.currentPage}) - ${SITE_TITLE}`}
-	description={`タグ「${tag}」が付いた記事の一覧を表示します。`}
+	title={`${displayMonth}の記事一覧 (ページ ${page.currentPage}) - ${SITE_TITLE}`}
+	description={`${SITE_TITLE}の${displayMonth}の記事一覧ページです。`}
 >
 	<a href="/" class="back-link">← ホームに戻る</a>
 
-	<h2 class="list-title">タグ {tag} の記事一覧 {page.lastPage > 1 && `(${page.currentPage} / ${page.lastPage} ページ)`}</h2>
+	<h2 class="list-title">{displayMonth} の記事一覧 {page.lastPage > 1 && `(${page.currentPage} / ${page.lastPage} ページ)`}</h2>
 	<ul class="post-list">
 		{posts.map((post) => {
 			const dateVal = post.data.published_at || post.data.pubDate || new Date();
@@ -87,7 +91,7 @@ const { data: posts } = page;
 			
 			{Array.from({ length: page.lastPage }, (_, i) => {
 				const pageNum = i + 1;
-				const pageUrl = pageNum === 1 ? `/posts/search/${tag}` : `/posts/search/${tag}/${pageNum}`;
+				const pageUrl = pageNum === 1 ? `/posts/archive/${year}/${month}` : `/posts/archive/${year}/${month}/${pageNum}`;
 				const isCurrent = pageNum === page.currentPage;
 				return (
 					<a href={pageUrl} class={`page-btn ${isCurrent ? 'page-current' : ''}`}>

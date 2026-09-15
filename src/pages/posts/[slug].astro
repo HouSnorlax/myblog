@@ -1,19 +1,38 @@
 ---
 import { type CollectionEntry, getCollection } from 'astro:content';
-import BaseHead from '../../components/BaseHead.astro';
-import Header from '../../components/Header.astro';
-import Footer from '../../components/Footer.astro';
+import Layout from '../../layouts/Layout.astro';
 
 export async function getStaticPaths() {
-	const posts = await getCollection('blog');
-	return posts.map((post) => ({
-		params: { slug: post.slug },
-		props: post,
-	}));
-}
-type Props = CollectionEntry<'blog'>;
+	const posts = (await getCollection('blog')).sort((a, b) => {
+		const aDate = a.data.published_at || a.data.pubDate || new Date(0);
+		const bDate = b.data.published_at || b.data.pubDate || new Date(0);
+		return bDate.valueOf() - aDate.valueOf();
+	});
 
-const post = Astro.props;
+	return posts.map((post, index) => {
+		// posts は新しい順（降順）
+		// prevPost: 1つ古い（過去の）記事
+		// nextPost: 1つ新しい（未来の）記事
+		const prevPost = index < posts.length - 1 ? posts[index + 1] : null;
+		const nextPost = index > 0 ? posts[index - 1] : null;
+
+		return {
+			params: { slug: post.slug },
+			props: {
+				post,
+				prevPost,
+				nextPost,
+			},
+		};
+	});
+}
+type Props = {
+	post: CollectionEntry<'blog'>;
+	prevPost: CollectionEntry<'blog'> | null;
+	nextPost: CollectionEntry<'blog'> | null;
+};
+
+const { post, prevPost, nextPost } = Astro.props;
 const { Content } = await post.render();
 
 const dateVal = post.data.published_at || post.data.pubDate || new Date();
@@ -33,294 +52,382 @@ const firstImage = match ? (match[1] || match[2]) : undefined;
 const ogImage = post.data.heroImage || firstImage;
 ---
 
-<!doctype html>
-<html lang="ja">
-	<head>
-		<BaseHead title={`${post.data.title} - MUHO's Blog`} description={post.data.snippet || post.data.description || ""} image={ogImage} />
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
-		<style>
-			body {
-				font-family: 'Inter', 'Noto Sans JP', sans-serif;
-				background-color: #f8fafc;
-				color: #334155;
-				margin: 0;
-				padding: 0;
-				width: 100%;
-				max-width: 100%;
-				overflow-x: hidden;
-			}
+<Layout
+	title={`${post.data.title} - MUHO's Blog`}
+	description={post.data.snippet || post.data.description || ""}
+	image={ogImage}
+>
+	<a href="/" class="back-link">← 戻る</a>
+	
+	<article class="article-container">
+		<h1 class="article-title">{post.data.title}</h1>
+		<time class="article-date" datetime={dateVal.toISOString()}>
+			{formattedDate}
+		</time>
 
-			main {
-				width: 100%;
-				max-width: 768px; /* max-w-screen-md */
-				margin: 0 auto;
-				padding: 2rem 1rem;
-				box-sizing: border-box;
-			}
+		<div class="article-body">
+			<Content />
+		</div>
 
-			.back-link {
-				display: inline-block;
-				margin-bottom: 1.5rem;
-				color: #2563eb;
-				text-decoration: none;
-				font-weight: 500;
-				transition: color 0.2s ease, transform 0.2s ease;
-			}
+		{post.data.tag && post.data.tag.length > 0 && (
+			<div class="tag-container">
+				<span class="tag-label">タグ:</span>
+				{post.data.tag.map((tag) => (
+					<a href={`/posts/search/${tag}`} class="tag-badge">
+						{tag}
+					</a>
+				))}
+			</div>
+		)}
+	</article>
 
-			.back-link:hover {
-				color: #1d4ed8;
-				transform: translateX(-4px);
-			}
-
-			.article-container {
-				background: #ffffff;
-				border: 1px solid #e2e8f0;
-				border-radius: 12px;
-				padding: 2rem;
-				box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-				box-sizing: border-box;
-				width: 100%;
-				overflow-wrap: break-word;
-				word-break: break-word;
-			}
-
-			.article-title {
-				font-size: 2.25rem;
-				font-weight: 800;
-				color: #1e293b;
-				margin-top: 0;
-				margin-bottom: 0.5rem;
-				line-height: 1.3;
-				overflow-wrap: break-word;
-				word-break: break-word;
-			}
-
-			.article-date {
-				font-size: 0.95rem;
-				color: #64748b;
-				display: block;
-				margin-bottom: 2rem;
-				padding-bottom: 1rem;
-				border-bottom: 1px solid #e2e8f0;
-			}
-
-			/* Styled typography for the post body */
-			.article-body {
-				font-size: 1.05rem;
-				line-height: 1.8;
-				color: #334155;
-				overflow-wrap: break-word;
-				word-break: break-word;
-			}
-
-			.article-body :global(h1),
-			.article-body :global(h2),
-			.article-body :global(h3),
-			.article-body :global(h4) {
-				color: #1e293b;
-				font-weight: 700;
-				margin-top: 2rem;
-				margin-bottom: 1rem;
-				overflow-wrap: break-word;
-				word-break: break-word;
-			}
-
-			.article-body :global(h1) { font-size: 1.6rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem; }
-			.article-body :global(h2) { font-size: 1.35rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.25rem; }
-			.article-body :global(h3) { font-size: 1.15rem; }
-			.article-body :global(h4) { font-size: 1.05rem; }
-
-			.article-body :global(p) {
-				margin-bottom: 1.25rem;
-				overflow-wrap: break-word;
-				word-break: break-word;
-			}
-
-			.article-body :global(ul),
-			.article-body :global(ol) {
-				margin-bottom: 1.25rem;
-				padding-left: 1.5rem;
-				overflow-wrap: break-word;
-				word-break: break-word;
-			}
-
-			.article-body :global(li) {
-				margin-bottom: 0.5rem;
-			}
-
-			.article-body :global(code) {
-				font-family: monospace;
-				background-color: #f1f5f9;
-				padding: 0.2rem 0.4rem;
-				border-radius: 4px;
-				font-size: 0.9em;
-				color: #0f172a;
-				word-break: break-word;
-			}
-
-			.article-body :global(pre) {
-				background-color: #0f172a;
-				color: #f8fafc;
-				padding: 1rem;
-				border-radius: 8px;
-				overflow-x: auto;
-				margin-bottom: 1.25rem;
-				max-width: 100%;
-				box-sizing: border-box;
-			}
-
-			.article-body :global(pre code) {
-				background-color: transparent;
-				padding: 0;
-				border-radius: 0;
-				color: inherit;
-				font-size: 0.9em;
-				word-break: normal;
-			}
-
-			.article-body :global(blockquote) {
-				border-left: 4px solid #3b82f6;
-				background-color: #eff6ff;
-				padding: 0.75rem 1rem;
-				margin: 0 0 1.25rem 0;
-				border-radius: 0 8px 8px 0;
-				font-style: italic;
-				color: #1e3a8a;
-				overflow-wrap: break-word;
-				word-break: break-word;
-			}
-
-			.article-body :global(a) {
-				color: #2563eb;
-				text-decoration: none;
-				border-bottom: 1px dashed #2563eb;
-				word-break: break-word;
-				overflow-wrap: anywhere;
-			}
-
-			.article-body :global(a:hover) {
-				color: #1d4ed8;
-				border-bottom-style: solid;
-			}
-
-			.article-body :global(img) {
-				display: block;
-				max-width: 100%;
-				height: auto;
-				border-radius: 8px;
-				margin: 1.5rem auto;
-				box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-			}
-
-			.article-body :global(table) {
-				display: block;
-				width: 100%;
-				max-width: 100%;
-				overflow-x: auto;
-				border-collapse: collapse;
-			}
-
-			.tag-container {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 0.5rem;
-				align-items: center;
-				font-size: 0.9rem;
-				color: #64748b;
-				margin-top: 2rem;
-				padding-top: 1rem;
-				border-top: 1px solid #e2e8f0;
-			}
-
-			.tag-label {
-				font-weight: 600;
-			}
-
-			.tag-badge {
-				background-color: #f1f5f9;
-				color: #475569;
-				padding: 0.2rem 0.6rem;
-				border-radius: 6px;
-				font-weight: 500;
-				text-decoration: none;
-				border: 1px solid #cbd5e1;
-				transition: all 0.2s ease;
-			}
-
-			.tag-badge:hover {
-				background-color: #3b82f6;
-				color: #ffffff;
-				border-color: #3b82f6;
-				transform: translateY(-1px);
-			}
-
-			@media (max-width: 640px) {
-				main {
-					padding: 1.25rem 0.75rem;
-				}
-				.article-container {
-					padding: 1.25rem 1rem;
-				}
-				.article-title {
-					font-size: 1.45rem;
-					line-height: 1.35;
-				}
-				.article-date {
-					font-size: 0.85rem;
-					margin-bottom: 1.5rem;
-					padding-bottom: 0.75rem;
-				}
-				.article-body {
-					font-size: 0.95rem;
-					line-height: 1.7;
-				}
-				.article-body :global(h1) { font-size: 1.3rem; margin-top: 1.5rem; }
-				.article-body :global(h2) { font-size: 1.15rem; margin-top: 1.25rem; }
-				.article-body :global(h3) { font-size: 1.05rem; }
-				.article-body :global(pre) {
-					padding: 0.75rem;
-					font-size: 0.85rem;
-				}
-				.tag-container {
-					font-size: 0.85rem;
-					gap: 0.35rem;
-				}
-				.tag-badge {
-					padding: 0.15rem 0.5rem;
-					font-size: 0.8rem;
-				}
-			}
-		</style>
-	</head>
-	<body>
-		<Header />
-		<main>
-			<a href="/" class="back-link">← 戻る</a>
-			
-			<article class="article-container">
-				<h1 class="article-title">{post.data.title}</h1>
-				<time class="article-date" datetime={dateVal.toISOString()}>
-					{formattedDate}
-				</time>
-
-				<div class="article-body">
-					<Content />
-				</div>
-
-				{post.data.tag && post.data.tag.length > 0 && (
-					<div class="tag-container">
-						<span class="tag-label">タグ:</span>
-						{post.data.tag.map((tag) => (
-							<a href={`/posts/search/${tag}`} class="tag-badge">
-								{tag}
-							</a>
-						))}
-					</div>
+	{(prevPost || nextPost) && (
+		<nav class="post-navigation" aria-label="前後の記事">
+			<div class="nav-item prev">
+				{prevPost && (
+					<a href={`/posts/${prevPost.slug}`} class="nav-card">
+						<span class="nav-direction">← 前の記事</span>
+						<span class="nav-title">{prevPost.data.title}</span>
+					</a>
 				)}
-			</article>
-		</main>
-		<Footer />
-	</body>
-</html>
+			</div>
+			<div class="nav-item next">
+				{nextPost && (
+					<a href={`/posts/${nextPost.slug}`} class="nav-card">
+						<span class="nav-direction">次の記事 →</span>
+						<span class="nav-title">{nextPost.data.title}</span>
+					</a>
+				)}
+			</div>
+		</nav>
+	)}
+</Layout>
+
+<style>
+	.back-link {
+		display: inline-block;
+		margin-bottom: 1.5rem;
+		color: #2563eb;
+		text-decoration: none;
+		font-weight: 500;
+		transition: color 0.2s ease, transform 0.2s ease;
+	}
+
+	.back-link:hover {
+		color: #1d4ed8;
+		transform: translateX(-4px);
+	}
+
+	.article-container {
+		background: #ffffff;
+		border: 1px solid #e2e8f0;
+		border-radius: 12px;
+		padding: 2rem;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+		box-sizing: border-box;
+		width: 100%;
+		overflow-wrap: break-word;
+		word-break: break-word;
+	}
+
+	.article-title {
+		font-size: 2.25rem;
+		font-weight: 800;
+		color: #1e293b;
+		margin-top: 0;
+		margin-bottom: 0.5rem;
+		line-height: 1.3;
+		overflow-wrap: break-word;
+		word-break: break-word;
+	}
+
+	.article-date {
+		font-size: 0.95rem;
+		color: #64748b;
+		display: block;
+		margin-bottom: 2rem;
+		padding-bottom: 1rem;
+		border-bottom: 1px solid #e2e8f0;
+	}
+
+	/* Styled typography for the post body */
+	.article-body {
+		font-size: 1.05rem;
+		line-height: 1.8;
+		color: #334155;
+		overflow-wrap: break-word;
+		word-break: break-word;
+	}
+
+	.article-body :global(h1),
+	.article-body :global(h2),
+	.article-body :global(h3),
+	.article-body :global(h4) {
+		color: #1e293b;
+		font-weight: 700;
+		margin-top: 2rem;
+		margin-bottom: 1rem;
+		overflow-wrap: break-word;
+		word-break: break-word;
+	}
+
+	.article-body :global(h1) { font-size: 1.6rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem; }
+	.article-body :global(h2) { font-size: 1.35rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.25rem; }
+	.article-body :global(h3) { font-size: 1.15rem; }
+	.article-body :global(h4) { font-size: 1.05rem; }
+
+	.article-body :global(p) {
+		margin-bottom: 1.25rem;
+		overflow-wrap: break-word;
+		word-break: break-word;
+	}
+
+	.article-body :global(ul),
+	.article-body :global(ol) {
+		margin-bottom: 1.25rem;
+		padding-left: 1.5rem;
+		overflow-wrap: break-word;
+		word-break: break-word;
+	}
+
+	.article-body :global(li) {
+		margin-bottom: 0.5rem;
+	}
+
+	.article-body :global(code) {
+		font-family: monospace;
+		background-color: #f1f5f9;
+		padding: 0.2rem 0.4rem;
+		border-radius: 4px;
+		font-size: 0.9em;
+		color: #0f172a;
+		word-break: break-word;
+	}
+
+	.article-body :global(pre) {
+		background-color: #0f172a;
+		color: #f8fafc;
+		padding: 1rem;
+		border-radius: 8px;
+		overflow-x: auto;
+		margin-bottom: 1.25rem;
+		max-width: 100%;
+		box-sizing: border-box;
+	}
+
+	.article-body :global(pre code) {
+		background-color: transparent;
+		padding: 0;
+		border-radius: 0;
+		color: inherit;
+		font-size: 0.9em;
+		word-break: normal;
+	}
+
+	.article-body :global(blockquote) {
+		border-left: 4px solid #3b82f6;
+		background-color: #eff6ff;
+		padding: 0.75rem 1rem;
+		margin: 0 0 1.25rem 0;
+		border-radius: 0 8px 8px 0;
+		font-style: italic;
+		color: #1e3a8a;
+		overflow-wrap: break-word;
+		word-break: break-word;
+	}
+
+	.article-body :global(a) {
+		color: #2563eb;
+		text-decoration: none;
+		border-bottom: 1px dashed #2563eb;
+		word-break: break-word;
+		overflow-wrap: anywhere;
+	}
+
+	.article-body :global(a:hover) {
+		color: #1d4ed8;
+		border-bottom-style: solid;
+	}
+
+	.article-body :global(img) {
+		display: block;
+		max-width: 100%;
+		height: auto;
+		border-radius: 8px;
+		margin: 1.5rem auto;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+	}
+
+	.article-body :global(table) {
+		display: block;
+		width: 100%;
+		max-width: 100%;
+		overflow-x: auto;
+		border-collapse: collapse;
+	}
+
+	.tag-container {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		align-items: center;
+		font-size: 0.9rem;
+		color: #64748b;
+		margin-top: 2rem;
+		padding-top: 1rem;
+		border-top: 1px solid #e2e8f0;
+	}
+
+	.tag-label {
+		font-weight: 600;
+	}
+
+	.tag-badge {
+		background-color: #f1f5f9;
+		color: #475569;
+		padding: 0.2rem 0.6rem;
+		border-radius: 6px;
+		font-weight: 500;
+		text-decoration: none;
+		border: 1px solid #cbd5e1;
+		transition: all 0.2s ease;
+	}
+
+	.tag-badge:hover {
+		background-color: #3b82f6;
+		color: #ffffff;
+		border-color: #3b82f6;
+		transform: translateY(-1px);
+	}
+
+	/* 前後の記事ナビゲーション */
+	.post-navigation {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1rem;
+		margin-top: 2rem;
+		width: 100%;
+	}
+
+	.nav-item {
+		display: flex;
+	}
+
+	.nav-item:empty {
+		display: none;
+	}
+
+	.nav-item.prev {
+		grid-column: 1;
+	}
+
+	.nav-item.next {
+		grid-column: 2;
+		justify-content: flex-end;
+	}
+
+	.nav-card {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		background: #ffffff;
+		border: 1px solid #e2e8f0;
+		border-radius: 12px;
+		padding: 1rem 1.25rem;
+		text-decoration: none;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+		transition: all 0.2s ease;
+		box-sizing: border-box;
+	}
+
+	.nav-card:hover {
+		border-color: #93c5fd;
+		transform: translateY(-2px);
+		box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+	}
+
+	.nav-item.next .nav-card {
+		text-align: right;
+	}
+
+	.nav-direction {
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: #2563eb;
+		margin-bottom: 0.35rem;
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+	}
+
+	.nav-item.next .nav-direction {
+		justify-content: flex-end;
+	}
+
+	.nav-title {
+		font-size: 0.95rem;
+		font-weight: 500;
+		color: #1e293b;
+		line-height: 1.45;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	.nav-card:hover .nav-title {
+		color: #2563eb;
+	}
+
+	@media (max-width: 640px) {
+		.article-container {
+			padding: 1.25rem 1rem;
+		}
+		.article-title {
+			font-size: 1.45rem;
+			line-height: 1.35;
+		}
+		.article-date {
+			font-size: 0.85rem;
+			margin-bottom: 1.5rem;
+			padding-bottom: 0.75rem;
+		}
+		.article-body {
+			font-size: 0.95rem;
+			line-height: 1.7;
+		}
+		.article-body :global(h1) { font-size: 1.3rem; margin-top: 1.5rem; }
+		.article-body :global(h2) { font-size: 1.15rem; margin-top: 1.25rem; }
+		.article-body :global(h3) { font-size: 1.05rem; }
+		.article-body :global(pre) {
+			padding: 0.75rem;
+			font-size: 0.85rem;
+		}
+		.tag-container {
+			font-size: 0.85rem;
+			gap: 0.35rem;
+		}
+		.tag-badge {
+			padding: 0.15rem 0.5rem;
+			font-size: 0.8rem;
+		}
+		.post-navigation {
+			grid-template-columns: 1fr;
+			gap: 0.75rem;
+			margin-top: 1.5rem;
+		}
+		.nav-item.prev,
+		.nav-item.next {
+			grid-column: auto;
+		}
+		.nav-card {
+			padding: 0.85rem 1rem;
+		}
+		.nav-direction {
+			font-size: 0.8rem;
+		}
+		.nav-title {
+			font-size: 0.9rem;
+		}
+	}
+</style>

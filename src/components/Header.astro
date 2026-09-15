@@ -4,32 +4,76 @@ import { SITE_TITLE } from '../consts';
 
 <header>
 	<div class="header-container">
-		<a href="/" class="brand-title">{SITE_TITLE}</a>
-		<nav>
+		<div class="header-left">
+			<button id="menu-toggle-btn" class="menu-toggle-btn" aria-label="メニューを開く">
+				<svg class="menu-icon" viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+					<line x1="3" y1="12" x2="21" y2="12"></line>
+					<line x1="3" y1="6" x2="21" y2="6"></line>
+					<line x1="3" y1="18" x2="21" y2="18"></line>
+				</svg>
+				<span class="menu-btn-text">メニュー</span>
+			</button>
+			<a href="/" class="brand-title">{SITE_TITLE}</a>
+		</div>
+		<nav class="header-nav">
 			<a href="/" class="nav-link">Home</a>
+			<a href="/posts" class="nav-link">記事一覧</a>
 		</nav>
 	</div>
 </header>
 
 <style>
 	header {
-		background-color: #1e293b; /* Dark slate gray matching bg-gray-800 look but more premium */
+		background-color: #1e293b;
 		color: #ffffff;
 		padding: 0.875rem 0;
 		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 		width: 100%;
 		box-sizing: border-box;
+		position: sticky;
+		top: 0;
+		z-index: 100;
 	}
 
 	.header-container {
 		width: 100%;
-		max-width: 768px; /* max-w-screen-md equivalent */
+		max-width: 1280px;
 		margin: 0 auto;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		padding: 0 1rem;
+		padding: 0 1.5rem;
 		box-sizing: border-box;
+	}
+
+	.header-left {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.menu-toggle-btn {
+		display: none;
+		align-items: center;
+		gap: 0.35rem;
+		background: rgba(255, 255, 255, 0.1);
+		color: #ffffff;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		padding: 0.35rem 0.65rem;
+		border-radius: 6px;
+		font-size: 0.85rem;
+		font-weight: 500;
+		cursor: pointer;
+		transition: background-color 0.2s ease, border-color 0.2s ease;
+	}
+
+	.menu-toggle-btn:hover {
+		background-color: rgba(255, 255, 255, 0.2);
+		border-color: rgba(255, 255, 255, 0.4);
+	}
+
+	.menu-icon {
+		display: block;
 	}
 
 	.brand-title {
@@ -45,11 +89,17 @@ import { SITE_TITLE } from '../consts';
 		opacity: 0.9;
 	}
 
+	.header-nav {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
 	.nav-link {
 		color: #e2e8f0;
 		text-decoration: none;
 		font-weight: 500;
-		transition: color 0.2s ease;
+		transition: color 0.2s ease, background-color 0.2s ease;
 		padding: 0.4rem 0.75rem;
 		border-radius: 6px;
 		font-size: 0.95rem;
@@ -60,6 +110,16 @@ import { SITE_TITLE } from '../consts';
 		background-color: rgba(255, 255, 255, 0.1);
 	}
 
+	@media (max-width: 1023px) {
+		.menu-toggle-btn {
+			display: inline-flex;
+		}
+
+		.header-container {
+			padding: 0 1rem;
+		}
+	}
+
 	@media (max-width: 640px) {
 		header {
 			padding: 0.75rem 0;
@@ -68,11 +128,17 @@ import { SITE_TITLE } from '../consts';
 			padding: 0 0.75rem;
 		}
 		.brand-title {
-			font-size: 1.2rem;
+			font-size: 1.15rem;
+		}
+		.menu-btn-text {
+			display: none;
+		}
+		.menu-toggle-btn {
+			padding: 0.35rem 0.45rem;
 		}
 		.nav-link {
-			padding: 0.35rem 0.6rem;
-			font-size: 0.9rem;
+			padding: 0.35rem 0.5rem;
+			font-size: 0.85rem;
 		}
 	}
 </style>
