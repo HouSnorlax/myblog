@@ -25,3 +25,8 @@ pnpm-debug.log*
 
 # personal development rule
 development_rule.md
+
+# sample preview & scratch scripts
+sample_ogp_preview/
+scripts/
+

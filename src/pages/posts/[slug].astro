@@ -48,8 +48,8 @@ const imgRegex = /!\[.*?\]\((.*?)\)|<img.*?src=["'](.*?)["']/i;
 const match = body.match(imgRegex);
 const firstImage = match ? (match[1] || match[2]) : undefined;
 
-// heroImage が指定されていれば優先し、なければ本文の最初の画像
-const ogImage = post.data.heroImage || firstImage;
+// heroImage が明示的に指定されていれば優先し、なければ自動生成OGP画像
+const ogImage = post.data.heroImage || `/og/${post.slug}.png`;
 ---
 
 <Layout
