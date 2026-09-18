@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "build:ogp": "node scripts/generate_ogp.mjs",
     "preview": "astro preview",
     "astro": "astro"
   },
